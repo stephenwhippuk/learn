@@ -1,0 +1,1 @@
+gcc `pkg-config --cflags glib-2.0 --libs glib-2.0` main.c -I /root/usr/include/gtk-4.0 -I /usr/include/cairo -I /root/usr/include/pango-1.0 -I /root/usr/include/harfbuzz -I /usr/include/gdk-pixbuf-2.0 -I /usr/include/graphene-1.0 -I /usr/lib/x86_64-linux-gnu/graphene-1.0/include
