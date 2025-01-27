@@ -65,7 +65,8 @@ int main(){
     printf("directory = '%s'\n", fullpath);
 
     char* stringList[10] = {NULL};
-    int readResult = readDirectoryContents(fullpath, stringList, 10);
+    int bufferSize = 10;
+    int readResult = readDirectoryContents(fullpath, stringList, bufferSize);
     switch(readResult){
         case 1:
             printf("unable to find find target\n");
@@ -80,7 +81,7 @@ int main(){
             printContents(stringList, 10);
 
     }
-    for(int i =0; i < 10; i++){
+    for(int i =0; i < bufferSize; i++){
         free(stringList[i]);
     }
 
