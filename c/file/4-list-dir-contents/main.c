@@ -1,7 +1,13 @@
 #include <stdincludes.h>
 
-int readDirectoryContents(char* path, char** buffer, int maxLen){
- struct stat statBuf = {0};
+struct DirectoryContent {
+    int size;
+    char** content;
+};
+
+int readDirectoryContents(char* path, struct DirectoryContent* content, int maxLen){
+    content->content = (char**) malloc(sizeof(char*) * maxLen);
+    struct stat statBuf = {0};
     int statSuccess = stat(path, &statBuf) == 0;
     if(!statSuccess){
         printf("unable to find find target\n");
@@ -27,24 +33,30 @@ int readDirectoryContents(char* path, char** buffer, int maxLen){
         int bufLength = strlen(dirp->d_name);
         char* name = (char*) malloc(sizeof(char) * bufLength);
         strcpy(name, dirp->d_name);
-        buffer[index] = name;    
+        content->content[index] = name;    
         index++;
     }
-
+    content->size = index;
     closedir(dir);
     return 0;
 }
 
-void printContents(char** stringList, int maxLength){
+void printContents(struct DirectoryContent* content){
     int index = 0;
     printf(".\n..\n");
-    while(index < maxLength && stringList[index] != NULL){
-        if(strcmp(stringList[index], ".") != 0 && strcmp(stringList[index], "..") != 0)
-            printf("%s\n", stringList[index]);
+    while(index < content->size){
+        if(strcmp(content->content[index], ".") != 0 && strcmp(content->content[index], "..") != 0)
+            printf("%s\n", content->content[index]);
         index++;
     }
 }
 
+void freeContent(struct DirectoryContent* content){
+    for (int i = 0 ; i < content->size; i++){
+        free(content->content[i]);
+    }
+    free(content->content);
+}
 
 int main(){
     char rootdir[1024] = {'\0'};  
@@ -64,9 +76,8 @@ int main(){
 
     printf("directory = '%s'\n", fullpath);
 
-    char* stringList[10] = {NULL};
-    int bufferSize = 10;
-    int readResult = readDirectoryContents(fullpath, stringList, bufferSize);
+    struct DirectoryContent content = {0};
+    int readResult = readDirectoryContents(fullpath, &content, 10);
     switch(readResult){
         case 1:
             printf("unable to find find target\n");
@@ -78,12 +89,10 @@ int main(){
             printf("unable to open target\n");
             break;
         default:
-            printContents(stringList, 10);
+            printContents(&content);
 
     }
-    for(int i =0; i < bufferSize; i++){
-        free(stringList[i]);
-    }
+    freeContent(&content);
 
     free(fullpath);
     
