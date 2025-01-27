@@ -10,21 +10,21 @@ int main(){
     // open 2 read only pointers to the data file
     FILE* contentToRead = fopen("../data/data.csv", "r"); // this one is used to read content
 
-    FILE* lineCounter = fopen("../data/data.csv", "r"); // this one is used to evaluate the length of each line
+    FILE* lineLengthCounter = fopen("../data/data.csv", "r"); // this one is used to evaluate the length of each line
 
     // test files opened correctly
-    if(!contentToRead || !lineCounter){
+    if(!contentToRead || !lineLengthCounter){
         printf("failed to open file for reading\n");
         exit(EXIT_FAILURE);
     }
 
     // calculate length of line, allocate the correct length of buffer and then read content of line
     int lineNumber = 0;
-    while(!feof(lineCounter)){
+    while(!feof(lineLengthCounter)){
         int lineLength = 0;
         int done = 0;
-        while(!feof(lineCounter) && !done){
-            char c = fgetc(lineCounter);
+        while(!feof(lineLengthCounter) && !done){
+            char c = fgetc(lineLengthCounter);
             if(c == '\n'){
                 done=1;
             }
@@ -48,7 +48,7 @@ int main(){
 
     // close the files 
     fclose(contentToRead);
-    fclose(lineCounter);
+    fclose(lineLengthCounter);
     
     exit(EXIT_SUCCESS);
 }
