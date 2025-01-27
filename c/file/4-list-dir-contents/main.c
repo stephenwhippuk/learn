@@ -1,5 +1,51 @@
 #include <stdincludes.h>
 
+int readDirectoryContents(char* path, char** buffer, int maxLen){
+ struct stat statBuf = {0};
+    int statSuccess = stat(path, &statBuf) == 0;
+    if(!statSuccess){
+        printf("unable to find find target\n");
+        return 1;
+    }
+    if( !S_ISDIR(statBuf.st_mode) ){
+        printf("not a directory\n");
+        return 2;
+    }
+
+    DIR *dir = NULL;
+    dir = opendir(path);
+    if(!dir){
+        printf("unable to open target\n");
+        return 3;
+    }
+
+    // now we need to get the contents of the directory
+    statBuf = (const struct stat){0};
+    struct dirent *dirp = {0};
+    int index = 0;
+    while((dirp = readdir(dir)) != NULL && index < maxLen ){
+        int bufLength = strlen(dirp->d_name);
+        char* name = (char*) malloc(sizeof(char) * bufLength);
+        strcpy(name, dirp->d_name);
+        buffer[index] = name;    
+        index++;
+    }
+
+    closedir(dir);
+    return 0;
+}
+
+void printContents(char** buffer, int maxLength){
+    int index = 0;
+    printf(".\n..\n");
+    while(index < maxLength && buffer[index] != NULL){
+        if(strcmp(buffer[index], ".") != 0 && strcmp(buffer[index], "..") != 0)
+            printf("%s\n", buffer[index]);
+        index++;
+    }
+}
+
+
 int main(){
     char rootdir[1024] = {'\0'};  
     chdir("../");
@@ -18,37 +64,25 @@ int main(){
 
     printf("directory = '%s'\n", fullpath);
 
-    // test if it is a directory
-    struct stat statBuf = {0};
-    int statSuccess = stat(fullpath, &statBuf) == 0;
-    if(!statSuccess){
-        printf("unable to find find target\n");
-        exit(EXIT_FAILURE);
-    }
-    if( !S_ISDIR(statBuf.st_mode) ){
-        printf("not a directory\n");
-        exit(EXIT_FAILURE);
-    }
+    char* buffer[10] = {NULL};
+    int result = readDirectoryContents(fullpath, buffer, 10);
+    switch(result){
+        case 1:
+            printf("unable to find find target\n");
+            break;
+        case 2:
+            printf("not a directory\n");
+            break;
+        case 3:
+            printf("unable to open target\n");
+            break;
+        default:
+            printContents(buffer, 10);
 
-    DIR *dir = NULL;
-    dir = opendir(fullpath);
-    if(!dir){
-        printf("unable to open target\n");
-        exit(EXIT_FAILURE);
     }
-
-    // now we need to get the contents of the directory
-    statBuf = (const struct stat){0};
-    struct dirent *dirp = {0};
-    printf(".\n..\n");
-    while((dirp = readdir(dir)) != NULL){
-        if(strcmp(dirp->d_name, ".") != 0 && strcmp(dirp->d_name, "..") != 0 ){
-
-            printf("%s\t%c\n", dirp->d_name, dirp->d_type);
-        }
+    for(int i =0; i < 10; i++){
+        free(buffer[i]);
     }
-
-    closedir(dir);
     free(fullpath);
     exit(EXIT_SUCCESS);
 }
