@@ -2,7 +2,7 @@
 #include "contentreader.h"
 
 int readDirectoryContents(char* path, struct DirectoryContent* content, int maxLen){
-    content->content = (char**) malloc(sizeof(char*) * maxLen);
+  
     struct stat statBuf = {0};
     int statSuccess = stat(path, &statBuf) == 0;
     if(!statSuccess){
@@ -24,8 +24,22 @@ int readDirectoryContents(char* path, struct DirectoryContent* content, int maxL
     // now we need to get the contents of the directory
     statBuf = (const struct stat){0};
     struct dirent *dirp = {0};
+    int numberOfFilesToRead = 0;
+    if(maxLen == USE_DIRECTORY_SIZE){
+        struct dirent *counter = {0};
+        DIR * counterDir = opendir(path);
+        while((counter = readdir(counterDir)) != NULL){
+            numberOfFilesToRead++;
+        }
+        closedir(counterDir);
+    }
+    else{
+        numberOfFilesToRead = maxLen;
+    }
+
+    content->content = (char**) malloc(sizeof(char*) * numberOfFilesToRead);
     int index = 0;
-    while((dirp = readdir(dir)) != NULL && index < maxLen ){
+    while((dirp = readdir(dir)) != NULL && index < numberOfFilesToRead ){
         int bufLength = strlen(dirp->d_name);
         char* name = (char*) malloc(sizeof(char) * bufLength);
         strcpy(name, dirp->d_name);
