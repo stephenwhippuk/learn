@@ -21,8 +21,7 @@ int main(){
 
     struct DirectoryContent content = {0};
 
-    const int MAX_SIZE = 10;
-    int readResult = readDirectoryContents(fullpath, &content, MAX_SIZE);
+    int readResult = readDirectoryContents(fullpath, &content, USE_DIRECTORY_SIZE);
     switch(readResult){
         case NOT_FOUND:
             printf("unable to find find target\n");

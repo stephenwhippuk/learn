@@ -1,6 +1,8 @@
 #ifndef _CONTENT_READER
 #define _CONTENT_READER
 
+#define USE_DIRECTORY_SIZE -1
+
 #define READ_SUCCESS 0
 #define NOT_FOUND 1
 #define NOT_DIRECTORY 2
