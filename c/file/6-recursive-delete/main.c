@@ -19,7 +19,8 @@ int main(){
             printf("cannot fetch file or folder stats\n");
             break;
         case ACCESSS_VIOLATION:
-            printf("You do not have permission to perform this operation");
+            printf("You do not have permission to perform this operation\n");
+            break;
         default:
             printf("folder deleted\n");
     }
