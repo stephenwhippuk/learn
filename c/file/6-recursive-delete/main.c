@@ -9,6 +9,7 @@ int main(){
         printf("\n*** please run setup first ***");
         exit(EXIT_FAILURE);
     }
+    closedir(dir);
     
     int result = recursiveDelete("data");
     switch(result){
