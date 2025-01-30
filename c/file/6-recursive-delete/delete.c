@@ -1,6 +1,11 @@
 #include <stdincludes.h>
 #include "delete.h"
 
+void unwind(DIR* folder){
+    closedir(folder);
+    chdir("..");
+}
+
 int doCheckPermissions(const char* dirName){
       DIR* folder = opendir(dirName);
     if(!folder){
@@ -17,23 +22,25 @@ int doCheckPermissions(const char* dirName){
             if(S_ISDIR(statBuf.st_mode)){
                 int status = doCheckPermissions(dirptr->d_name);
                 if(status != SUCCESS){
-                    closedir(folder);
+                    unwind(folder);
                     return status;
                 }
             }
             if(!(statBuf.st_mode & S_IWUSR)){
-                closedir(folder);
+                unwind(folder);
                 return ACCESSS_VIOLATION;
             }
         }
         else{
+            unwind(folder);
             return CANNOT_FETCH_STAT;
         }
     }
-    closedir(folder);
-    chdir("..");
+    unwind(folder);
     return 0;
 }
+
+
 
 int doDelete(const char* dirName){
     DIR* folder = opendir(dirName);
@@ -51,18 +58,18 @@ int doDelete(const char* dirName){
             if(S_ISDIR(statBuf.st_mode)){
                 int status = doDelete(dirptr->d_name);
                 if(status != SUCCESS){
-                    closedir(folder);
+                    unwind(folder);
                     return status;
                 }
             }
             remove(dirptr->d_name);
         }
         else{
+            unwind(folder);
             return CANNOT_FETCH_STAT;
         }
     }
-    closedir(folder);
-    chdir("..");
+    unwind(folder);
     return 0;
 }
 
